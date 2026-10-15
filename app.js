@@ -99,6 +99,7 @@ function renderTable(data = dataMahasiswa) {
     
     data.forEach((mhs, index) => {
         const tr = document.createElement("tr");
+
         tr.innerHTML = `
         <td>${index + 1} </td>
         <td>
@@ -118,13 +119,25 @@ function renderTable(data = dataMahasiswa) {
     updateCounter(data.length);
         
         // Percobaan 3-2 langkah 8
+          tr.innerHTML = `
+            <td>${index + 1}</td>
+        <td>
+        <img src="img/avatar-default.svg" alt="Foto ${mhs.nama}" class="avatar-img" width="36" height="36"> </td>
+        <td><strong>${mhs.npm}</strong></td>
+        <td>${mhs.nama}</td>
+        <td><span class="badge">${mhs.program_studi}</span></td>
+        <td>${mhs.angkatan}</td>
+        <td><a href="mailto:${mhs.email}" class="link-email">${mhs.email}</a></td>
+        <td> <button type="button" class="btn btn-danger btn-sm" onclick="hapusMahasiswa('${mhs.npm}')">
+        Hapus </button> </td>`;
 
 
         // Percobaan 3-2 langkah 9
+        tabelBody.appendChild(tr);
         
 
     // Percobaan 3-2 langkah 10
-
+     updateCounter(data.length);
 }
 
 // 6. Validasi Form Sisi Klien Menggunakan Regular Expression (Percobaan 3-3).
@@ -176,15 +189,27 @@ if (formTambah) {
 
         if (!validation.isValid) {
             // Percobaan 3-4 Langkah 6
-            
+            showAlert(validation.message, "danger");
+            return;
         }
 
         // Percobaan 3-4 Langkah 7
-
+      const mahasiswaBaru = {
+      nim,
+      nama,
+      program_studi: prodi,
+      angkatan: parseInt(angkatan, 10),
+      email,
+    };
 
 
         // Percobaan 3-4 Langkah 8
-        
+    renderTable(dataMahasiswa);
+    formTambah.reset();
+    showAlert(
+      `Data mahasiswa ${nama} (${nim}) berhasil ditambahkan ke sistem!`,
+      "success",
+    );
     });
 }
 
@@ -192,14 +217,39 @@ if (formTambah) {
 // 8. Event Handling Hapus Data Mahasiswa (Percobaan 3-5).
 
 function hapusMahasiswa(npm) {
-
+  const mhs = dataMahasiswa.find((item) => item.npm === npm);
+  if (!mhs) return;
 }
 
+const kondirmasi = confirm(
+  `Apakah Anda yakin ingin menghapus data mahasiswa: \n${mhs.nama} (${nim})?`,
+);
+if (konfirmasi) {
+  dataMahasiswa = dataMahasiswa.filter((item) => item.nim !== nim);
+  renderTable(dataMahasiswa);
+  showAlert(
+    `data mahasiswa dengan NIM ${nim} berhasil di hapus dari sistem. `,
+    "info",
+  );
+}
 
 // 9. Fitur Pencarian Langsung Real-Time / Live Search (Percobaan 3-5)
 
 if (inputSearch) {
-    
+  inputSearch.addEventListener("input", function () {
+    const keyword = inputSearch.value.trim().toLowerCase();
+    if (keyword === "") {
+      renderTable(dataMahasiswa);
+    } else {
+      const hasilFilter = dataMahasiswa.filter(
+        (mhs) =>
+          mhs.nim.toLowerCase().includes(keyword) ||
+          mhs.nama.toLowerCase().includes(keyword) ||
+          mhs.program_studi.toLowerCase().includes(keyword),
+      );
+      renderTable(hasilFilter);
+    }
+  });
 }
 
 // Inisialisasi saat DOM selesai dimuat
